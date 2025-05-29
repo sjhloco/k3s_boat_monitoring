@@ -14,29 +14,28 @@ I use these tools to monitor the following things on my narrowboat:
 - **Teltonika router:** Prometheus ([snmp-exporter](https://github.com/prometheus/snmp_exporter/tree/main)) will monitor the routers health, cellular signal and traffic via SNMP
 - **Victron equipment:** Victron Cerbo GX uses [MQTT](https://mqtt.org) to share data with Telegraf (and InfluxDB), the idea is to have local dashboard rather than relay on the Internet dependant Victron VRM
 
-The below steps assume you already have a Kubernetes node setup with helm installed ready to deploy the pods on. I used an Android phone running K3s, see my [blog]() to learn how to do this or you want more explanations around the proceeding steps.
+The below steps assume you already have a Kubernetes node setup with helm installed ready to deploy the pods on. I used an Android phone running K3s, see my [blog](https://theworldsgonemad.net/2025/k3s-boat-monitoring/) to learn how to do this or you want more explanations around the proceeding steps.
 
 1. Clone the repo (`git clone https://github.com/sjhloco/k3s_boat_monitoring.git`) and edit the following attributes from the helm value files (in helm_values) and mqqt_keepalive.sh to match your local environment:
-   - *influxdb_values.yaml:*
-     - adminUser.password: To change the InfluxDB GUI admin user password (default is pa$$w0rd)
-   - *telegraf_values.yaml:*
-    - mqtt_consumer:.servers: Change 10.40.10.121 to the IP address of your Cerbo GX
-    - mqtt_consumer.topics: Change 48e7da892735 to the MQTT ID of your Cerbo GX (check with [MQTT explorer](http://mqtt-explorer.com))
-    - mqtt_consumer.topic_parsing.topic: Change 48e7da892735 to the MQTT ID of your Cerbo GX
-   - *grafana_values.yaml:*
-    - adminPassword: To change the Grafana GUI admin user password (default is pa$$w0rd)
-   - *snmp.yml:*
-    - auths.snmpv2_com.community: Change to be the same SNMP community value configured on your Teltonika RUT950 router
-   - *prometheus_values.yaml:*
-    - extraScrapeConfigs.job_name.snmp_teltonika.static_configs.targets: Your Teltonika RUT950 router IP address
-   - *mqtt_keepalive.sh:*
-     - Replace 10.40.10.121 and 48e7da892735 with your Cerbo GX IP address and MQTT ID
-     - 
-Below are a few attributes that are optional, can be changed if you wish to customise the deployment further (but dont have to be)
-
- - Influxdb: organization, bucket, token
- - telegraf: organization, bucket, token, hostname (as seen in influxdb)
- - grafana: dbName (bucket),  httpHeaderValue1 (token)
+   - **influxdb_values.yaml:**
+       - *adminUser.password:* To change the InfluxDB GUI admin user password (default is pa$$w0rd)
+   - **telegraf_values.yaml:**
+       - *mqtt_consumer:.servers:* Change 10.40.10.121 to the IP address of your Cerbo GX
+       - *mqtt_consumer.topics:* Change 48e7da892735 to the MQTT ID of your Cerbo GX (check with [MQTT explorer](http://mqtt-explorer.com))
+       - *mqtt_consumer.topic_parsing.topic:* Change 48e7da892735 to the MQTT ID of your Cerbo GX
+   - **grafana_values.yaml:**
+       - adminPassword: To change the Grafana GUI admin user password (default is pa$$w0rd)
+   - **snmp.yml:**
+       - *auths.snmpv2_com.community:* Change to be the same SNMP community value configured on your Teltonika RUT950 router
+   - **prometheus_values.yaml:**
+       - *extraScrapeConfigs.job_name.snmp_teltonika.static_configs.targets:* Your Teltonika RUT950 router IP address
+   - **mqtt_keepalive.sh:**
+       - Replace 10.40.10.121 and 48e7da892735 with your Cerbo GX IP address and MQTT ID
+     
+   Below are a few attributes that are optional, can be changed if you wish to customise the deployment further (but dont have to be)\
+       - Influxdb: organization, bucket, token\
+       - telegraf: organization, bucket, token, hostname (as seen in influxdb)\
+       - grafana: dbName (bucket),  httpHeaderValue1 (token)
 
 2. Copy all the files over to your K3s node
 
@@ -84,7 +83,7 @@ Once everything has been deployed is deployed should see all the Pods up and the
 
 ```bash
 kubectl get pods -n monitoring
-kubectl get services  -n monitoring
+kubectl get services -n monitoring
 ```
 
 If any of the Pods are not up use the pod Name from *get pods* in the following commands to check Pod status, logs as well as the application logs.
