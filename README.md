@@ -1,5 +1,7 @@
 # K3s Boat Monitoring
 
+![Image](https://github.com/user-attachments/assets/13f4dac2-3d89-4ed3-b432-9085f582f636)
+
 This repo is a quick guide for deploying a TIG stack and Prometheus as kubernetes pods:
 
 - **Telegraf:** The agent for collecting and reporting metrics and data, so the receiver or collector of streaming telemetry data. It uses plug-ins for collecting and reporting metrics and can send the metrics to files, message queues, and other endpoints (*InfluxDB, Graphite, Kafka, MQTT*)
