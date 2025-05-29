@@ -1,0 +1,71 @@
+image:
+  repo: "docker.io/library/telegraf"
+  tag: latest
+env:
+  - name: HOSTNAME
+    value: "k3s-telegraf"
+podAnnotations:
+  prometheus.io/port: "8888"
+  prometheus.io/scrape: "true"
+config:
+  processors:
+    - enum:
+        mapping:
+          field: "status"
+          dest: "status_code"
+          value_mappings:
+            healthy: 1
+            problem: 2
+            critical: 3
+    - regex:
+        tags:
+          key: "topic"  
+          pattern: "^N/[^/]+/[^/]+/[^/]+/(.+)$" 
+          replacement: "${1}"
+  outputs:
+    - influxdb_v2:
+        urls:
+          - "http://infl-influxdb2.monitoring.svc.cluster.local:8086"
+        token: "NIXkAW3LErwAeJIyYG3CVOawv8e-a3k7WZMCPR7hknjYEISTItMBg8yPKEjKIZMYUIBncy80SuYbso=="
+        organization: "stesworld"
+        bucket: "stesbucket"
+    - prometheus_client:
+        listen: ":8888"
+  inputs:
+    - cisco_telemetry_mdt:
+        transport: "grpc"
+        service_address: ":57000"
+    - http_response:
+        urls:
+          - "https://google.com"
+          - "https://bbc.co.uk"
+        response_timeout: "10s"
+        method: "GET"
+    - ping:
+        urls:
+          - "google.com"
+          - "bbc.co.uk"
+          - "1.1.1.1"
+          - "8.8.8.8"
+          - "10.40.10.1"
+        arguments: ["-c", "3", "-i", "5.0"]
+    - dns_query:
+        servers:
+          - "8.8.8.8"
+          - "1.1.1.1"
+        record_type: "A"
+        timeout: "2s"
+    - mqtt_consumer:
+        servers: ["tcp://10.40.10.121:1883"]
+        data_format: "json"     
+        topics:
+          - "N/48e7da892735/system/#"
+          - "N/48e7da892735/battery/#"
+          - "N/48e7da892735/solarcharger/#"
+          - "N/48e7da892735/tank/#"
+          - "N/48e7da892735/temperature/#"
+          - "N/48e7da892735/vebus/#"
+    - mqtt_consumer.topic_parsing:
+        topic: "N/48e7da892735/#"
+        measurement: "measurement/_"
+        tags: "_/cerbo/path/VRMinstance"

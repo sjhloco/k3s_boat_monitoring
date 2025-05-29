@@ -1,0 +1,20 @@
+podAnnotations:
+  prometheus.io/scrape: "true" 
+  prometheus.io/port: "8086" 
+image:
+  repository: influxdb
+  tag: latest
+adminUser:
+  organization: "stesworld"
+  bucket: "stesbucket"
+  user: "admin"
+  retention_policy: "90d"
+  password: "pa$$w0rd"
+  token: "NIXkAW3LErwAeJIyYG3CVOawv8e-a3k7WZMCPR7hknjYEISTItMBg8yPKEjKIZMYUIBncy80SuYbso=="
+service:
+  type: ClusterIP
+  port: 8086
+  targetPort: 8086
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8086"

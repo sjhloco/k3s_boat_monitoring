@@ -1,0 +1,35 @@
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+service:
+  enabled: true
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+  portName: service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+persistence:
+  type: pvc
+  enabled: true
+adminUser: admin
+adminPassword: pa$$w0rd
+plugins:
+  - grafana-clock-panel
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: influxdb-influxQL
+        type: influxdb
+        access: proxy
+        url: http://infl-influxdb2.monitoring.svc.cluster.local:8086
+        jsonData:
+          dbName: stesbucket
+          httpHeaderName1: "Authorization"
+        secureJsonData:
+          httpHeaderValue1: "Token NIXkAW3LErwAeJIyYG3CVOawv8e-a3k7WZMCPR7hknjYEISTItMBg8yPKEjKIZMYUIBncy80SuYbso=="
+      - name: prometheus
+        type: prometheus
+        url:  http://prom-prometheus-server.monitoring.svc.cluster.local:80
